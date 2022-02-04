@@ -65,7 +65,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QPushButton" name="search_2">
+    <widget class="QPushButton" name="search_button">
      <property name="geometry">
       <rect>
        <x>380</x>
