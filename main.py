@@ -1,6 +1,5 @@
 import requests
 import sys
-from PyQt5 import uic
 from PyQt5.QtGui import QPixmap
 from interface import Ui_MainWindow
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -11,8 +10,7 @@ class Example(Ui_MainWindow, QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.static_map_link = 'https://static-maps.yandex.ru/1.x'
-        self.static_map_params = {'l': 'sat', 'll': (55.753220, 37.622513), 'z': 5,
-                                  'size': (1006, 703), 'key': '248120a9-95c1-65b2-8876-fdd3b462ff8d'}
+        self.static_map_params = {'l': 'map', 'll': '37.622513,55.753220', 'size': '640,450', 'z': '10'}
         self.geocoder_link = 'https://static-maps.yandex.ru/1.x'
         self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b', 'gecode': None,
                                 'format': 'json'}
