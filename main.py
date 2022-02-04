@@ -12,9 +12,11 @@ class Example(Ui_MainWindow, QMainWindow):
         self.setupUi(self)
         self.static_map_link = 'https://static-maps.yandex.ru/1.x'
         self.z = 10
+        self.ll = [37.622513, 55.753220]
         self.l_list = ['map', 'sat', 'skl']
         self.l_number = 0
-        self.static_map_params = {'l': 'map', 'll': '37.622513,55.753220', 'size': '640,450', 'z': str(self.z)}
+        self.static_map_params = {'l': 'map', 'll': f'{str(self.ll[0])},{str(self.ll[1])}',
+                                  'size': '640,450', 'z': str(self.z)}
         self.geocoder_link = 'https://static-maps.yandex.ru/1.x'
         self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b', 'gecode': None,
                                 'format': 'json'}
@@ -45,7 +47,16 @@ class Example(Ui_MainWindow, QMainWindow):
             self.z -= 1
             if self.z < 1:
                 self.z = 1
-        self.static_map_params = {'l': 'map', 'll': '37.622513,55.753220', 'size': '640,450', 'z': str(self.z)}
+        if event.key() == Qt.Key_Down:
+            self.ll[1] -= 0.2
+        if event.key() == Qt.Key_Up:
+            self.ll[1] += 0.2
+        if event.key() == Qt.Key_Left:
+            self.ll[0] -= 0.2
+        if event.key() == Qt.Key_Right:
+            self.ll[0] += 0.2
+        self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
+        self.static_map_params['z'] = str(self.z)
         self.static_map_request()
         self.set_pixmap()
 
