@@ -143,7 +143,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -157,7 +157,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QRadioButton" name="spn_radio">
+       <widget class="QRadioButton" name="map_radio">
         <property name="font">
          <font>
           <pointsize>10</pointsize>
