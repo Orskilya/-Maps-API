@@ -11,6 +11,9 @@ class Example(Ui_MainWindow, QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.static_map_link = 'https://static-maps.yandex.ru/1.x'
+        self.is_indexing = False
+        self.current_index = None
+        self.current_addres = None
         self.z = 10
         self.pt = None
         self.ll = [37.622513, 55.753220]
@@ -20,7 +23,8 @@ class Example(Ui_MainWindow, QMainWindow):
                                   'll': f'{str(self.ll[0])},{str(self.ll[1])}',
                                   'size': '640,450', 'z': str(self.z), 'pt': self.pt}
         self.geocoder_link = 'https://geocode-maps.yandex.ru/1.x'
-        self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b', 'geocode': None,
+        self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
+                                'geocode': None,
                                 'format': 'json'}
         self.image = None
         self.pixmap = None
@@ -28,10 +32,24 @@ class Example(Ui_MainWindow, QMainWindow):
         self.map_radio.clicked.connect(self.change_visibility)
         self.sat_radio.clicked.connect(self.change_visibility)
         self.skl_radio.clicked.connect(self.change_visibility)
+        self.off_indexing.clicked.connect(self.change_indexing)
+        self.on_indexing.clicked.connect(self.change_indexing)
+        self.off_indexing.setChecked(True)
         self.search_button.clicked.connect(self.search)
         self.reset.clicked.connect(self.update_marker)
         self.static_map_request()
         self.set_pixmap()
+
+    def change_indexing(self):
+        if self.off_indexing.isChecked():
+            self.is_indexing = False
+            self.result_search.setText('\n'.join(perenos(self.current_addres, 40)))
+        if self.on_indexing.isChecked():
+            self.is_indexing = True
+            if self.current_index:
+                self.result_search.setText('\n'.join(perenos(self.current_index + ' ' + self.current_addres, 40)))
+            else:
+                self.result_search.setText('\n'.join(perenos(self.current_addres, 40)))
 
     def change_visibility(self):
         if self.map_radio.isChecked():
@@ -84,14 +102,30 @@ class Example(Ui_MainWindow, QMainWindow):
         try:
             toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+            self.current_addres = toponym_address
             toponym_coordinates = toponym["Point"]["pos"].split(' ')
+            self.current_index = str(
+                self.response["response"]["GeoObjectCollection"]["featureMember"][0][
+                    "GeoObject"][
+                    'metaDataProperty']['GeocoderMetaData']['Address'][
+                    'postal_code'])
             if toponym_address:
                 self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
                 self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
                 self.static_map_request()
                 self.update_marker('add', self.ll)
-        except:
-            pass
+                if self.is_indexing and self.current_index:
+                    stroka = self.current_index + ' ' + toponym_address
+                else:
+                    stroka = toponym_address
+                self.result_search.setText('\n'.join(perenos(stroka, 40)))
+                if toponym_address:
+                    self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
+                    self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
+                    self.static_map_request()
+                    self.update_marker('add', self.ll)
+        except Exception:
+            self.current_index = None
 
     def update_marker(self, action='clear', ll=None):
         if action == 'add':
@@ -102,6 +136,11 @@ class Example(Ui_MainWindow, QMainWindow):
             self.pt = None
         self.static_map_params['pt'] = self.pt
         self.static_map_request()
+
+
+def perenos(items, chunk_size):
+    for i in range(0, len(items), chunk_size):
+        yield items[i:i+chunk_size]
 
 
 def except_hook(cls, exception, traceback):
