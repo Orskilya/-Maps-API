@@ -24,8 +24,7 @@ class Example(Ui_MainWindow, QMainWindow):
                                   'size': '640,450', 'z': str(self.z), 'pt': self.pt}
         self.geocoder_link = 'https://geocode-maps.yandex.ru/1.x'
         self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
-                                'geocode': None,
-                                'format': 'json'}
+                                'geocode': None, 'format': 'json'}
         self.image = None
         self.pixmap = None
         self.response = None
@@ -96,7 +95,8 @@ class Example(Ui_MainWindow, QMainWindow):
         self.geocoder_params['geocode'] = self.searching_line.text()
         self.geocoder_request()
         try:
-            toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0][
+                "GeoObject"]
             toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
             self.current_address = toponym_address
             toponym_coordinates = toponym["Point"]["pos"].split(' ')
@@ -112,7 +112,7 @@ class Example(Ui_MainWindow, QMainWindow):
                 self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
                 self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
                 self.static_map_request()
-                self.update_marker('add', self.ll)
+                self.update_marker('add')
                 if self.is_indexing and self.current_index:
                     string = self.current_index + ', ' + toponym_address
                 else:
@@ -122,12 +122,12 @@ class Example(Ui_MainWindow, QMainWindow):
                     self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
                     self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
                     self.static_map_request()
-                    self.update_marker('add', self.ll)
+                    self.update_marker('add')
                 self.searching_line.clear()
         except KeyError:
             self.current_index = ''
 
-    def update_marker(self, action='clear', ll=None):
+    def update_marker(self, action='clear'):
         if action == 'add':
             ll = f'{str(self.ll[0])},{str(self.ll[1])}'
             self.pt = ll + ',ya_ru'
