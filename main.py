@@ -84,7 +84,6 @@ class Example(Ui_MainWindow, QMainWindow):
         try:
             toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
-            print(toponym_address)
             toponym_coordinates = toponym["Point"]["pos"].split(' ')
             if toponym_address:
                 self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
@@ -99,6 +98,7 @@ class Example(Ui_MainWindow, QMainWindow):
             ll = f'{str(self.ll[0])},{str(self.ll[1])}'
             self.pt = ll + ',ya_ru'
         else:
+            self.searching_line.clear()
             self.pt = None
         self.static_map_params['pt'] = self.pt
         self.static_map_request()
