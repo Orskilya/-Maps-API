@@ -11,13 +11,13 @@ class Example(Ui_MainWindow, QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.static_map_link = 'https://static-maps.yandex.ru/1.x'
-        self.z = 10
+        self.spn = [0.5, 0.5]
         self.ll = [37.622513, 55.753220]
         self.current_visibility = 'map'
         self.l_number = 0
         self.static_map_params = {'l': self.current_visibility,
                                   'll': f'{str(self.ll[0])},{str(self.ll[1])}',
-                                  'size': '640,450', 'z': str(self.z)}
+                                  'size': '640,450', 'spn': f'{str(self.spn[0])},{str(self.spn[1])}'}
         self.geocoder_link = 'https://static-maps.yandex.ru/1.x'
         self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b', 'gecode': None,
                                 'format': 'json'}
@@ -55,23 +55,27 @@ class Example(Ui_MainWindow, QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.z += 1
-            if self.z > 17:
-                self.z = 17
+            self.spn[0] -= 0.01
+            self.spn[1] -= 0.01
+            if self.spn[0] < 0 and self.spn[1] < 0:
+                self.spn[0] = 0
+                self.spn[1] = 0
         if event.key() == Qt.Key_PageDown:
-            self.z -= 1
-            if self.z < 1:
-                self.z = 1
+            self.spn[0] += 0.01
+            self.spn[1] += 0.01
+            if self.spn[0] > 5 and self.spn[1] > 5:
+                self.spn[0] = 5
+                self.spn[1] = 5
         if event.key() == Qt.Key_Down:
-            self.ll[1] -= 0.2
+            self.ll[1] -= 0.1
         if event.key() == Qt.Key_Up:
-            self.ll[1] += 0.2
+            self.ll[1] += 0.1
         if event.key() == Qt.Key_Left:
-            self.ll[0] -= 0.2
+            self.ll[0] -= 0.1
         if event.key() == Qt.Key_Right:
-            self.ll[0] += 0.2
+            self.ll[0] += 0.1
         self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
-        self.static_map_params['z'] = str(self.z)
+        self.static_map_params['spn'] = f'{str(self.spn[0])},{str(self.spn[1])}'
         self.static_map_request()
 
 
