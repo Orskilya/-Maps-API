@@ -64,8 +64,8 @@ class Example(Ui_MainWindow, QMainWindow):
                 self.z = 17
         if event.key() == Qt.Key_PageDown:
             self.z -= 1
-            if self.z < 1:
-                self.z = 1
+            if self.z < 2:
+                self.z = 2
         if event.key() == Qt.Key_Down:
             self.ll[1] -= 0.2
         if event.key() == Qt.Key_Up:
@@ -81,20 +81,24 @@ class Example(Ui_MainWindow, QMainWindow):
     def search(self):
         self.geocoder_params['geocode'] = self.searching_line.text()
         self.geocoder_request()
-        toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-        toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
-        toponym_coordinates = toponym["Point"]["pos"].split(' ')
-        if toponym_address:
-            self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
-            self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
-            self.static_map_request()
-            self.update_marker('add', self.ll)
+        try:
+            toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["text"]
+            print(toponym_address)
+            toponym_coordinates = toponym["Point"]["pos"].split(' ')
+            if toponym_address:
+                self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
+                self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
+                self.static_map_request()
+                self.update_marker('add', self.ll)
+        except:
+            pass
 
     def update_marker(self, action='clear', ll=None):
         if action == 'add':
             ll = f'{str(self.ll[0])},{str(self.ll[1])}'
             self.pt = ll + ',ya_ru'
-        elif action == 'clear':
+        else:
             self.pt = None
         self.static_map_params['pt'] = self.pt
         self.static_map_request()
