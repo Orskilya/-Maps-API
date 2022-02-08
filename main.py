@@ -97,19 +97,26 @@ class Example(Ui_MainWindow, QMainWindow):
         self.static_map_request()
 
     def mousePressEvent(self, event):
-        really_x = event.x() - 340
-        really_y = event.y() - 90
-        pixels_spn_y = self.spn[0] * 0.58 / 225
-        new_coord_y = (really_y - 225) * pixels_spn_y
-        pixels_spn_x = self.spn[0] * 1.5 / 320
-        new_coord_x = (really_x - 320) * pixels_spn_x
-        ll = f'{self.ll[0] + new_coord_x},{self.ll[1] - new_coord_y}'
-        self.pt = ll + ',ya_ru'
-        self.static_map_params['pt'] = self.pt
-        self.static_map_request()
+        pos_x = event.x()
+        pos_y = event.y()
+        if 340 < pos_x < 980 and 90 < pos_y < 540:
+            really_x = event.x() - 340
+            really_y = event.y() - 90
+            pixels_spn_y = self.spn[0] * 0.58 / 225
+            new_coord_y = (really_y - 225) * pixels_spn_y
+            pixels_spn_x = self.spn[0] * 1.5 / 320
+            new_coord_x = (really_x - 320) * pixels_spn_x
+            ll = f'{self.ll[0] + new_coord_x},{self.ll[1] - new_coord_y}'
+            self.pt = ll + ',ya_ru'
+            self.static_map_params['pt'] = self.pt
+            self.static_map_request()
+            self.search(request=ll)
 
-    def search(self):
-        self.geocoder_params['geocode'] = self.searching_line.text()
+    def search(self, request=None):
+        if request:
+            self.geocoder_params['geocode'] = request
+        else:
+            self.geocoder_params['geocode'] = self.searching_line.text()
         self.geocoder_request()
         try:
             toponym = self.response["response"]["GeoObjectCollection"]["featureMember"][0][
@@ -126,20 +133,22 @@ class Example(Ui_MainWindow, QMainWindow):
             except KeyError:
                 self.current_index = ''
             if toponym_address:
-                self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
-                self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
-                self.static_map_request()
-                self.update_marker('add')
+                if not request:
+                    self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
+                    self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
+                    self.static_map_request()
+                    self.update_marker('add')
                 if self.is_indexing and self.current_index:
                     string = self.current_index + ', ' + toponym_address
                 else:
                     string = toponym_address
                 self.result_search.setText(string)
                 if toponym_address:
-                    self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
-                    self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
-                    self.static_map_request()
-                    self.update_marker('add')
+                    if not request:
+                        self.ll = [float(toponym_coordinates[0]), float(toponym_coordinates[1])]
+                        self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
+                        self.static_map_request()
+                        self.update_marker('add')
                 self.searching_line.clear()
         except KeyError:
             self.current_index = ''
