@@ -99,22 +99,14 @@ class Example(Ui_MainWindow, QMainWindow):
     def mousePressEvent(self, event):
         really_x = event.x() - 340
         really_y = event.y() - 90
-        if really_x < 320:
-            pixels_spn_x = self.spn[0] * 1.5 / 320
-            new_coord_x = (really_x - 320) * pixels_spn_x
-            ll = f'{self.ll[0] + new_coord_x},{self.ll[1]}'
-            self.pt = ll + ',ya_ru'
-            self.static_map_params['pt'] = self.pt
-            self.static_map_request()
-        else:
-            pixels_spn_x = self.spn[0] * 1.5 / 320
-            new_coord_x = (really_x - 320) * pixels_spn_x
-            print(new_coord_x)
-            ll = f'{self.ll[0] + new_coord_x},{self.ll[1]}'
-            self.pt = ll + ',ya_ru'
-            self.static_map_params['pt'] = self.pt
-            self.static_map_request()
-        # print(f"Координаты: {event.x()}, {event.y()}")
+        pixels_spn_y = self.spn[0] * 0.58 / 225
+        new_coord_y = (really_y - 225) * pixels_spn_y
+        pixels_spn_x = self.spn[0] * 1.5 / 320
+        new_coord_x = (really_x - 320) * pixels_spn_x
+        ll = f'{self.ll[0] + new_coord_x},{self.ll[1] - new_coord_y}'
+        self.pt = ll + ',ya_ru'
+        self.static_map_params['pt'] = self.pt
+        self.static_map_request()
 
     def search(self):
         self.geocoder_params['geocode'] = self.searching_line.text()
