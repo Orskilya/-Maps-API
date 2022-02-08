@@ -73,25 +73,25 @@ class Example(Ui_MainWindow, QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.spn[0] += 0.01
-            self.spn[1] += 0.01
+            self.spn[0] /= 2
+            self.spn[1] /= 2
             if self.z > 17:
                 self.z = 17
         if event.key() == Qt.Key_PageDown:
-            self.spn[0] -= 0.01
-            self.spn[1] -= 0.01
-            if self.spn[0] < 0.01:
-                self.spn[0] = 0.01
-            if self.spn[1] < 0.01:
-                self.spn[1] = 0.01
+            self.spn[0] *= 2
+            self.spn[1] *= 2
+            if self.spn[0] > 60:
+                self.spn[0] = 60
+            if self.spn[1] > 60:
+                self.spn[1] = 60
         if event.key() == Qt.Key_Down:
-            self.ll[1] -= 0.2
+            self.ll[1] -= self.spn[1]
         if event.key() == Qt.Key_Up:
-            self.ll[1] += 0.2
+            self.ll[1] += self.spn[1]
         if event.key() == Qt.Key_Left:
-            self.ll[0] -= 0.2
+            self.ll[0] -= self.spn[0]
         if event.key() == Qt.Key_Right:
-            self.ll[0] += 0.2
+            self.ll[0] += self.spn[0]
         self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
         self.static_map_params['spn'] = f'{str(self.spn[0])},{str(self.spn[1])}'
         self.static_map_request()
