@@ -15,13 +15,14 @@ class Example(Ui_MainWindow, QMainWindow):
         self.current_index = None
         self.current_address = ''
         self.z = 10
+        self.spn = [0.3, 0.3]
         self.pt = None
         self.ll = [37.622513, 55.753220]
         self.current_visibility = 'map'
         self.l_number = 0
         self.static_map_params = {'l': self.current_visibility,
                                   'll': f'{str(self.ll[0])},{str(self.ll[1])}',
-                                  'size': '640,450', 'z': str(self.z), 'pt': self.pt}
+                                  'size': '640,450', 'spn': f'{str(self.spn[0])},{str(self.spn[1])}', 'pt': self.pt}
         self.geocoder_link = 'https://geocode-maps.yandex.ru/1.x'
         self.geocoder_params = {'apikey': '40d1649f-0493-4b70-98ba-98533de7710b',
                                 'geocode': None, 'format': 'json'}
@@ -72,13 +73,17 @@ class Example(Ui_MainWindow, QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.z += 1
+            self.spn[0] += 0.01
+            self.spn[1] += 0.01
             if self.z > 17:
                 self.z = 17
         if event.key() == Qt.Key_PageDown:
-            self.z -= 1
-            if self.z < 2:
-                self.z = 2
+            self.spn[0] -= 0.01
+            self.spn[1] -= 0.01
+            if self.spn[0] < 0.01:
+                self.spn[0] = 0.01
+            if self.spn[1] < 0.01:
+                self.spn[1] = 0.01
         if event.key() == Qt.Key_Down:
             self.ll[1] -= 0.2
         if event.key() == Qt.Key_Up:
@@ -88,8 +93,28 @@ class Example(Ui_MainWindow, QMainWindow):
         if event.key() == Qt.Key_Right:
             self.ll[0] += 0.2
         self.static_map_params['ll'] = f'{str(self.ll[0])},{str(self.ll[1])}'
-        self.static_map_params['z'] = str(self.z)
+        self.static_map_params['spn'] = f'{str(self.spn[0])},{str(self.spn[1])}'
         self.static_map_request()
+
+    def mousePressEvent(self, event):
+        really_x = event.x() - 340
+        really_y = event.y() - 90
+        if really_x < 320:
+            pixels_spn_x = self.spn[0] * 1.5 / 320
+            new_coord_x = (really_x - 320) * pixels_spn_x
+            ll = f'{self.ll[0] + new_coord_x},{self.ll[1]}'
+            self.pt = ll + ',ya_ru'
+            self.static_map_params['pt'] = self.pt
+            self.static_map_request()
+        else:
+            pixels_spn_x = self.spn[0] * 1.5 / 320
+            new_coord_x = (really_x - 320) * pixels_spn_x
+            print(new_coord_x)
+            ll = f'{self.ll[0] + new_coord_x},{self.ll[1]}'
+            self.pt = ll + ',ya_ru'
+            self.static_map_params['pt'] = self.pt
+            self.static_map_request()
+        # print(f"Координаты: {event.x()}, {event.y()}")
 
     def search(self):
         self.geocoder_params['geocode'] = self.searching_line.text()
